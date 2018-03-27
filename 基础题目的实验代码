@@ -1,1 +1,192 @@
 
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class cal : MonoBehaviour
+{
+    public Texture2D img;//添加背景图片
+    public GUIStyle buttonstyle;//设置按键规格
+    string text = "";//显示结果
+
+    public class mycocluator
+    {
+        //存储运算数字
+        float[] operation_number = new float[200];
+        int shuzi_top = -1;
+
+        //存储运算符号
+        char[] operation = new char[200];
+        int caozuo_top = -1;
+
+
+        
+      //  Stack<char> operation = new Stack<char>();
+      // 尝试用栈堆解决操作符
+
+        public string computer(string s)
+        {
+            int i = 0;
+            while (i < s.Length)
+            {
+                switch (s[i])
+                {
+                    case '+':
+                        operation[caozuo_top+1] = '+';
+                        caozuo_top++;
+                        break;
+                        //尝试用栈解决
+                    case '-':
+                        operation[caozuo_top+1] = '-';
+                        caozuo_top++;
+                        break;
+                    case '*':
+                        operation[caozuo_top+1] = '*';
+                        caozuo_top++;
+                        break;
+                    case '/':
+                        operation[caozuo_top+1] = '/';
+                        caozuo_top++;
+                        break;
+                }
+                int j = 0;
+                string temps = "";
+                while (((i + j) < s.Length) && ((s[i + j] <= '9' && s[i + j] >= '0') || s[i + j] == '.'))
+                {
+                    temps += s[i + j];
+                    j++;
+                }
+                if (j != 0)
+                {
+                    float temp = float.Parse(temps);
+                    shuzi_top++;
+                    operation_number[shuzi_top] = temp;
+                    i += j;
+                }
+                else
+                {
+                    i++;
+                }
+            }
+
+
+            int k = 0;
+            while (caozuo_top > -1)
+            {
+                Debug.Log(k);
+                k++;
+                float temp1, temp2;
+                char tempc;
+                Debug.Log("o_top:" + caozuo_top);
+                if (caozuo_top == -1)
+                    break;
+                tempc = operation[caozuo_top];
+                caozuo_top--;
+                Debug.Log("o_top:" + caozuo_top);
+                temp1 = operation_number[shuzi_top];
+                shuzi_top--;
+                temp2 = operation_number[shuzi_top];
+                shuzi_top--;
+                switch (tempc)
+                {
+                    case '+':
+                        operation_number[shuzi_top + 1] = temp1 + temp2;
+                        shuzi_top++;
+                        break;
+                    case '-':
+                        operation_number[shuzi_top + 1] = temp2 - temp1;
+                        shuzi_top++;
+                        break;
+                    case '*':
+                        operation_number[shuzi_top + 1] = temp1 * temp2;
+                        shuzi_top++;
+                        break;
+                    case '/':
+                        operation_number[shuzi_top + 1] = temp2 / temp1;
+                        shuzi_top++;
+                        break;
+                }
+            }
+
+            Debug.Log(operation_number[shuzi_top].ToString());
+
+
+
+
+            return operation_number[shuzi_top].ToString();
+        }
+    }
+
+
+    void OnGUI()
+    {
+
+
+        GUIStyle fontStyle = new GUIStyle();
+        fontStyle.fontSize = 40;
+        fontStyle.normal.background = img;
+        //穿插背景图片
+        GUI.Label(new Rect(0, 0, 1024, 781), "", fontStyle);
+        GUI.Box(new Rect(300, 30, 290, 50), text);
+
+        for (int i = 0; i < 3; i++)
+        {
+        for (int j = 0; j <3 ; j++)
+        {
+            if (GUI.Button(new Rect(300 + i * 60, 100 + j * 60, 50, 50), 1 + j * 3 + i + "", "button"))
+                {
+                    text += 1 + j * 3 + i;
+                }
+            }
+        }
+
+        if (GUI.Button(new Rect(480, 100, 50, 50), "CE", "button"))
+        {
+            text = "";
+        }
+
+        if (GUI.Button(new Rect(540, 100, 50, 50), "<-", "button"))
+        {
+            if (text.Length > 0)
+                text = text.Remove(text.Length - 1, 1);
+        }
+
+        if (GUI.Button(new Rect(300, 280, 110, 50), "0", "button"))
+        {
+            text += "0";
+        }
+
+        if (GUI.Button(new Rect(420, 280, 50, 50), ".", "button"))
+        {
+            text += ".";
+        }
+
+        if (GUI.Button(new Rect(480, 160, 50, 50), "+", "button"))
+        {
+            text += "+";
+        }
+
+        if (GUI.Button(new Rect(480, 220, 50, 50), "-", "button"))
+        {
+            text += "-";
+        }
+
+        if (GUI.Button(new Rect(540, 160, 50, 50), "x", "button"))
+        {
+            text += "*";
+        }
+
+        if (GUI.Button(new Rect(480, 280, 50, 50), "/", "button"))
+        {
+            text += "/";
+        }
+
+        if (GUI.Button(new Rect(540, 220, 50, 110), "=", "button"))
+        {
+            mycocluator c = new mycocluator();
+            text = c.computer(text);
+        }
+    }
+
+
+}
